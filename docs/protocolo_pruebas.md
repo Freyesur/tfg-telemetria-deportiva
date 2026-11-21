@@ -1,0 +1,19 @@
+# Protocolo de validación experimental
+
+## 1. Objetivo y alcance
+Validar el funcionamiento técnico integrado del prototipo wearable (ESP32 + sensores) y del backend (Mosquitto, Telegraf e InfluxDB en Docker), evaluando la precisión relativa de las mediciones, la fiabilidad de las comunicaciones, la lógica de alertas y la autonomía real.
+
+## 2. Participantes y fases
+Siguiendo un enfoque de validación técnica simplificado, las pruebas iniciales se realizarán exclusivamente con mediciones propias del autor. En caso de incorporar voluntarios externos posteriormente (adultos que practiquen actividad física habitual, previo consentimiento informado), no se recogerán datos médicos ni identificativos y se asignará a cada sesión un código interno único generado por el investigador.
+
+## 3. Procedimiento experimental por subsistema
+* **Frecuencia cardíaca (OE1, OE5):** Registro simultáneo del sensor MAX30102 y del reloj de referencia Garmin Forerunner 55. Se realizarán al menos 3 ensayos en reposo (5 min cada uno) y 2–3 ensayos en movimiento (caminar y trote suave, 15–20 min, sin esfuerzos de riesgo). Se documentará el punto exacto de fijación, la sujeción y las condiciones de cada ensayo. Métricas: MAE, correlación de Pearson y análisis Bland-Altman.
+* **Temperatura superficial (OE1):** Registro continuo del MCP9808 en contacto con la piel (reposo y actividad suave) comparado con un termómetro digital comercial de superficie, documentando la temperatura ambiental de referencia y el tiempo de estabilización térmica. Métrica: desviación media (°C) y estabilidad.
+* **Geolocalización GPS (OE2, OE5):** Recorrido a pie a cielo abierto pasando por un conjunto de puntos de referencia conocidos (*waypoints*). Se distinguirá el error absoluto respecto a los *waypoints* (verdad terreno) de la discrepancia relativa frente al track del Garmin. Métricas: error cuadrático medio (RMSE) y porcentaje de disponibilidad de *fix*.
+* **Comunicaciones y persistencia (OE3):** Transmisión continua a 1 Hz vía Wi-Fi (punto de acceso móvil) hacia el broker Mosquitto y almacenamiento en InfluxDB. Comparación entre mensajes generados/publicados por el ESP32 y registros recibidos en base de datos, incluyendo cortes intencionados del punto de acceso para verificar la reconexión automática. Métricas: tasa de pérdida de paquetes (%), latencia media (s) y tiempo de recuperación.
+* **Validación de alertas (OE4):** Evaluación con datos sintéticos inyectados mediante MQTT, utilizando perfiles ficticios de edad y frecuencia cardíaca en reposo para las ecuaciones de Tanaka y Karvonen. Se probarán umbrales de esfuerzo elevado, esfuerzo máximo, lectura no fiable, variación brusca de temperatura y corte de comunicaciones (30 s sin datos), documentando en cada caso: valores de entrada, condición evaluada, resultado esperado y resultado obtenido.
+* **Autonomía y consumo (OE6):** Prueba en banco de funcionamiento ininterrumpido con batería LiPo de 3,7 V y 1800 mAh (reemplazo con polaridad verificada y crimpado de fábrica) transmitiendo con todos los sensores y Wi-Fi activos hasta corte de tensión, junto con la medición de corriente media de consumo para caracterizar el gasto energético.
+
+## 4. Medidas de seguridad y protección de datos
+* **Seguridad física y eléctrica:** No se reutilizará la batería reparada; la batería definitiva cuenta con circuito de protección integrado (PCM) y polaridad verificada antes de su conexión. Las pruebas físicas serán de intensidad moderada/suave y podrán detenerse en cualquier momento.
+* **Protección de datos:** No se almacenan nombres, correos ni datos médicos. Los recorridos GPS se realizarán en zonas abiertas sin iniciar/finalizar en domicilios particulares y no se publicarán coordenadas exactas identificables en la memoria. El acceso a la base de datos local está restringido al autor y todos los registros brutos se eliminarán tras la defensa del TFG.
