@@ -1,0 +1,6 @@
+.env
+secrets.h
+mosquitto/data/
+mosquitto/log/
+influxdb/
+*.DS_Store
